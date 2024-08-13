@@ -27,6 +27,7 @@ jobs:
 
       - run: docker build --tag hasanify/switchr-timeline-handler:${{ steps.version.outputs.version }} --tag hasanify/switchr-timeline-handler:latest .
       - run: docker push hasanify/switchr-timeline-handler:${{ steps.version.outputs.version }}
+      - run: docker push hasanify/switchr-timeline-handler:latest
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
