@@ -1,0 +1,7 @@
+services:
+  app:
+    image: hasanify/switchr-timeline-handler:latest
+    env_file:
+      - .env
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"

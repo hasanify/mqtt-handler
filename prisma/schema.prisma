@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DeviceStatus {
+  online
+  offline
+}
+
+model Device {
+  id        String       @id @default(uuid())
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  alias     String
+  status    DeviceStatus @default(offline)
+  owner     User?        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String?
+  timeline  Timeline[]
+  sharedTo  User[]       @relation("SharedDevices")
+  switches  Json         @default("{\"switch_1\": \"switch_1\", \"switch_2\": \"switch_2\", \"switch_3\": \"switch_3\", \"switch_4\": \"switch_4\"}")
+
+  @@map("devices")
+}
+
+model Timeline {
+  id        String       @id @default(uuid())
+  timestamp DateTime     @default(now())
+  status    DeviceStatus
+  device    Device       @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  deviceId  String
+
+  @@map("timeline")
+}
+
+model User {
+  id            String      @id @default(uuid())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  email         String      @unique
+  name          String
+  devices       Device[]
+  sharedDevices Device[]    @relation("SharedDevices")
+  expoTokens    ExpoToken[]
+
+  @@map("users")
+}
+
+model ExpoToken {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  userId    String
+
+  @@map("expo_tokens")
+}
