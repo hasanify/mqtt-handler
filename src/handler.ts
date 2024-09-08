@@ -3,7 +3,10 @@ import { getPosition, randomString } from "@/utils";
 import { DevicePowerStatus, DeviceStatus } from "@prisma/client";
 import mqtt from "mqtt";
 
-const topic = process.env.MQTT_TOPIC_BASE! + "+/status";
+const statusTopic = process.env.MQTT_TOPIC_BASE! + "+/status";
+const powerTopic = process.env.MQTT_TOPIC_BASE! + "+/power";
+
+const topics = [statusTopic, powerTopic];
 const connectionURI = `${process.env.MQTT_PROTOCOL}://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`;
 
 const handleMqtt = () => {
@@ -23,9 +26,9 @@ const handleMqtt = () => {
 
   mqttClient.on("connect", (err) => {
     if (err) console.log(err);
-    mqttClient.subscribe(topic, { qos: 1 }, (err) => {
+    mqttClient.subscribe(topics, { qos: 1 }, (err) => {
       if (!err) {
-        console.log("mqtt connected and subscribed to ", topic);
+        console.log("mqtt connected and subscribed to ", topics);
       } else {
         console.log(err);
       }
