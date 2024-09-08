@@ -12,17 +12,24 @@ enum DeviceStatus {
   offline
 }
 
+enum DevicePowerStatus {
+  power_on
+  power_off
+}
+
 model Device {
-  id        String       @id @default(uuid())
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  alias     String
-  status    DeviceStatus @default(offline)
-  owner     User?        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId   String?
-  timeline  Timeline[]
-  sharedTo  User[]       @relation("SharedDevices")
-  switches  Json         @default("{\"switch_1\": \"switch_1\", \"switch_2\": \"switch_2\", \"switch_3\": \"switch_3\", \"switch_4\": \"switch_4\"}")
+  id          String            @id @default(uuid())
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  alias       String
+  status      DeviceStatus      @default(offline)
+  power       DevicePowerStatus @default(power_off)
+  owner       User?             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String?
+  timeline    Timeline[]
+  powerStatus PowerStatus[]
+  sharedTo    User[]            @relation("SharedDevices")
+  switches    Json              @default("{\"switch_1\": \"switch_1\", \"switch_2\": \"switch_2\", \"switch_3\": \"switch_3\", \"switch_4\": \"switch_4\"}")
 
   @@map("devices")
 }
@@ -35,6 +42,16 @@ model Timeline {
   deviceId  String
 
   @@map("timeline")
+}
+
+model PowerStatus {
+  id        String            @id @default(uuid())
+  timestamp DateTime          @default(now())
+  status    DevicePowerStatus
+  device    Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  deviceId  String
+
+  @@map("power_status")
 }
 
 model User {

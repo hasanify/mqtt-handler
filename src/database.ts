@@ -1,6 +1,6 @@
 import sendNotification from "@/notification";
 import { capitalize } from "@/utils";
-import { DeviceStatus, PrismaClient } from "@prisma/client";
+import { DevicePowerStatus, DeviceStatus, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -50,6 +50,41 @@ export const updateTimeline = async (id: string, status: DeviceStatus) => {
     },
   });
   return timeline;
+};
+
+export const updatePowerStatus = async (
+  id: string,
+  status: DevicePowerStatus
+) => {
+  const device = await prisma.device.findFirst({
+    where: { id },
+    include: {
+      sharedTo: { include: { expoTokens: true } },
+      owner: { include: { expoTokens: true } },
+    },
+  });
+
+  if (!device) return console.log("device not found");
+
+  if (device.power === status && device.createdAt !== device.updatedAt)
+    return console.log("no need to update");
+
+  await prisma.device.update({
+    where: {
+      id,
+    },
+    data: {
+      power: status,
+    },
+  });
+
+  const powerStatus = await prisma.powerStatus.create({
+    data: {
+      status,
+      deviceId: id,
+    },
+  });
+  return powerStatus;
 };
 
 export const removeExpoToken = async (pushToken: string) => {

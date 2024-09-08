@@ -1,6 +1,6 @@
-import { updateTimeline } from "@/database";
+import { updatePowerStatus, updateTimeline } from "@/database";
 import { getPosition, randomString } from "@/utils";
-import { DeviceStatus } from "@prisma/client";
+import { DevicePowerStatus, DeviceStatus } from "@prisma/client";
 import mqtt from "mqtt";
 
 const topic = process.env.MQTT_TOPIC_BASE! + "+/status";
@@ -63,6 +63,12 @@ const handleMqtt = () => {
         if (msg.status && msg.status !== "") {
           const status: DeviceStatus = msg.status;
           await updateTimeline(device, status);
+          mqttClient.publish(topic, "", { retain: true, qos: 1 });
+        }
+      } else if (command === "power") {
+        if (msg.status && msg.status !== "") {
+          const status: DevicePowerStatus = msg.status;
+          await updatePowerStatus(device, status);
           mqttClient.publish(topic, "", { retain: true, qos: 1 });
         }
       }
