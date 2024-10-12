@@ -30,6 +30,7 @@ model Device {
   powerStatus PowerStatus[]
   sharedTo    User[]            @relation("SharedDevices")
   switches    Json              @default("{\"switch_1\": \"switch_1\", \"switch_2\": \"switch_2\", \"switch_3\": \"switch_3\", \"switch_4\": \"switch_4\"}")
+  relayStates Json              @default("{\"1\": false, \"2\": false, \"3\": false, \"4\": false}")
 
   @@map("devices")
 }

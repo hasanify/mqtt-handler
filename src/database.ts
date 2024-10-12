@@ -3,6 +3,12 @@ import { capitalize } from "@/utils";
 import { DevicePowerStatus, DeviceStatus, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+export interface RelayStates {
+  "1": boolean;
+  "2": boolean;
+  "3": boolean;
+  "4": boolean;
+}
 
 export const updateTimeline = async (id: string, status: DeviceStatus) => {
   const device = await prisma.device.findFirst({
@@ -85,6 +91,26 @@ export const updatePowerStatus = async (
     },
   });
   return powerStatus;
+};
+
+export const updateRelayStates = async (id: string, relayStates: any) => {
+  const device = await prisma.device.findFirst({
+    where: { id },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!device) return console.log("device not found");
+
+  await prisma.device.update({
+    where: {
+      id: device.id,
+    },
+    data: {
+      relayStates,
+    },
+  });
 };
 
 export const removeExpoToken = async (pushToken: string) => {
